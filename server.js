@@ -17,7 +17,7 @@ import devoirsRoutes from "./routes/devoirsRoutes.js";
 import demandeRoutes from "./routes/demandeRoutes.js";
 
 import liveCoursRoutes from "./routes/liveCoursRoutes.js";
-import corsMiddleware from "./middleware/cors.js";
+import corsMiddleware from "./middlewares/cors.js";
 
 import connectDB from "./config/db.js";
 import "./config/cloudinary.js";
