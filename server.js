@@ -33,38 +33,6 @@ const app = express();
 
 //CORS
 
-/*const cors = require("cors");
-
-const allowedOrigins = [
-  "https://www.senecolevirtuelle.com",
-  "https://senecolevirtuelle.com"
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Autoriser les requêtes sans Origin
-    // (Postman, certains outils backend, etc.)
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error("Origine non autorisée par CORS"));
-  },
-
-  credentials: true,
-
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization"
-  ]
-};
-app.use(cors(corsOptions));*/
 
 app.use(corsMiddleware);
 //app.options("*", cors(corsOptions));
@@ -80,15 +48,6 @@ app.use(morgan("dev"));
 // SOCKET.IO
 // ============================
 
-/*const server = http.createServer(app);
-
-
-const io = new Server(server,{
-  cors:{
-    origin:"http://localhost:3000",
-    methods:["GET","POST"]
-  }
-});*/
 
 const server = http.createServer(app);
 
@@ -350,20 +309,6 @@ const PORT = process.env.PORT || 8989;
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
 });
-/*const PORT =
-process.env.PORT || 8989;
-
-
-
-server.listen(
-PORT,
-()=>{
-
-console.log(
-`✅ Server running on port ${PORT}`
-);
-
-});*/
 
 
 
