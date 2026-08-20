@@ -28,6 +28,10 @@ export const startLive = async (req,res)=>{
 
     }
 
+    console.log("📥 Démarrage live");
+console.log("profId reçu :", req.body.profId);
+console.log("classeId reçu :", req.body.classeId);
+
 
     const live = await LiveCours.create({
 
