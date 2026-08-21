@@ -1,6 +1,6 @@
 // Démarrer un cours en direct au clic du prof
 import LiveCours from "../models/LiveCours.js";
-import mongoose from "mongoose";
+//import mongoose from "mongoose";
 
 
 export const startLive = async (req,res)=>{
@@ -108,7 +108,58 @@ export const getLiveClasse = async (req, res) => {
   };
 
 //Arrêter un direct
-export const stopLive = async(req,res)=>{
+export const stopLive = async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const live = await LiveCours.findById(id);
+
+    if (!live) {
+      return res.status(404).json({
+        message: "Live introuvable"
+      });
+    }
+
+    // 🔐 Vérifier que le prof qui arrête est bien le propriétaire
+    if (live.profId.toString() !== req.prof._id.toString()) {
+      return res.status(403).json({
+        message: "Vous n'êtes pas autorisé à arrêter ce live"
+      });
+    }
+
+    live.statut = "termine";
+    live.dateFin = new Date();
+
+    await live.save();
+
+    // 🔥 Informer les élèves
+    req.io
+      .to(live.classeId.toString())
+      .emit("live-stopped", {
+        liveId: live._id,
+        classeId: live.classeId
+      });
+
+    console.log("🛑 LIVE TERMINÉ :", live._id);
+
+    res.json({
+      message: "Cours terminé",
+      live
+    });
+
+  } catch (error) {
+
+    console.error("❌ Erreur stopLive :", error);
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+};
+/*export const stopLive = async(req,res)=>{
 
     try{
 
@@ -146,4 +197,4 @@ export const stopLive = async(req,res)=>{
 
     }
 
-};
+};*/
