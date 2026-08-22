@@ -28,5 +28,10 @@ const demandeAccesSchema = new mongoose.Schema({
   },
 });
 
+demandeAccesSchema.index(
+  { eleveId: 1, profId: 1 },
+  { unique: true }
+);
+
 const DemandeAcces = mongoose.model("DemandeAcces", demandeAccesSchema);
 export default DemandeAcces;

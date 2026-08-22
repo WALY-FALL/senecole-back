@@ -1,27 +1,22 @@
 import express from "express";
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { ajouterExercices, getExercicesParProfesseur, getExercicesParClasse, supprimerExercices } from "../controller/exercicesController.js";
-import { verifyToken } from "../middlewares/authMiddleware.js";
-import { protect } from "../middlewares/authMiddleware.js";
+
+import {
+  ajouterExercices,
+  getExercicesParProfesseur,
+  getExercicesParClasse,
+  supprimerExercices
+} from "../controller/exercicesController.js";
+
+import {
+  verifyToken,
+  protect
+} from "../middlewares/authMiddleware.js";
+
 import cloudinary from "../config/cloudinary.js";
 
-
-
 const router = express.Router();
-
-
-// Storage local
-/*const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});*/
-
-//const upload = multer({ storage });
 
 
 // =====================================================
@@ -29,11 +24,13 @@ const router = express.Router();
 // =====================================================
 
 const cloudinaryStorage = new CloudinaryStorage({
+
   cloudinary: cloudinary,
 
   params: async (req, file) => {
+
     return {
-      folder: "senecolevirtuelle/cours",
+      folder: "senecolevirtuelle/exercices",
 
       resource_type: "auto",
 
@@ -44,46 +41,62 @@ const cloudinaryStorage = new CloudinaryStorage({
           .replace(/\.[^/.]+$/, "")
           .replace(/[^a-zA-Z0-9-_]/g, "_"),
     };
+
   },
+
 });
 
 
 // =====================================================
-// CHOIX DU STOCKAGE
+// MULTER
 // =====================================================
-
-const storage =
-  process.env.NODE_ENV === "production"
-    ? cloudinaryStorage
-    : localStorage;
-
 
 const upload = multer({
-  storage,
+  storage: cloudinaryStorage
 });
 
-// Route upload exercices
 
-router.post("/", upload.array("fichiers", 5), ajouterExercices);
+// =====================================================
+// ROUTES
+// =====================================================
+
+// Ajouter un exercice
+router.post(
+  "/",
+  verifyToken,
+  upload.array("fichiers", 10),
+  ajouterExercices
+);
 
 
-// Routes
+// Récupérer les exercices d'un professeur
+router.get(
+  "/prof",
+  verifyToken,
+  getExercicesParProfesseur
+);
 
 
-// Ajouter un exercice (sécurisé)
-router.post("/", verifyToken, upload.array("fichiers", 10), ajouterExercices);
+// Récupérer les exercices d'une classe
+router.get(
+  "/classe/:classeId",
+  verifyToken,
+  getExercicesParClasse
+);
 
-// Récupérer tous les cours d'un professeur
-router.get("/prof", verifyToken ,getExercicesParProfesseur);
 
-// Récupérer tous les cours d'une classe
-router.get("/classe/:classeId", verifyToken, getExercicesParClasse);
-
+// Route test
 router.get("/test", (req, res) => {
   res.send("Route exercice OK");
 });
 
-// Supprimer un exercice (sécurisé)
-router.delete("/:id", protect, supprimerExercices);
+
+// Supprimer un exercice
+router.delete(
+  "/:id",
+  protect,
+  supprimerExercices
+);
+
 
 export default router;

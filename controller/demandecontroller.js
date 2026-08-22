@@ -13,13 +13,24 @@ export const creerDemande = async (req, res) => {
     }
 
     // 🔍 Vérifier si la demande existe déjà
-    const deja = await DemandeAcces.findOne({ eleveId, profId, classeId });
+    // 🔍 Vérifier si l'élève a déjà une demande pour ce professeur
+const deja = await DemandeAcces.findOne({
+  eleveId,
+  profId
+});
+
+if (deja) {
+  return res.status(400).json({
+    message: "Cet élève a déjà choisi une classe pour ce professeur."
+  });
+}
+    /*const deja = await DemandeAcces.findOne({ eleveId, profId, classeId });
 
     if (deja) {
       return res
         .status(400)
         .json({ message: "Demande déjà envoyée pour cette classe." });
-    }
+    }*/
 
     const demande = await DemandeAcces.create({
       eleveId,
