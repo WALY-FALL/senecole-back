@@ -1,5 +1,5 @@
 import Cours from "../models/coursmodel.js";
-import Prof from "../models/profmodel.js";
+//import Prof from "../models/profmodel.js";
 
 // Ajouter un cours
 export const ajouterCours = async (req, res) => {

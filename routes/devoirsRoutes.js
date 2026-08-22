@@ -1,47 +1,122 @@
 import express from "express";
 import multer from "multer";
-import { ajouterDevoirs, getDevoirsParProfesseur, getDevoirsParClasse, supprimerDevoirs } from "../controller/devoirsController.js";
-import { verifyToken } from "../middlewares/authMiddleware.js";
-import { protect } from "../middlewares/authMiddleware.js";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { ajouterDevoirs,getDevoirsParProfesseur,getDevoirsParClasse,supprimerDevoirs,} from "../controller/devoirsController.js";
 
+import {verifyToken, protect,} from "../middlewares/authMiddleware.js";
+
+import cloudinary from "../config/cloudinary.js";
 
 const router = express.Router();
 
 
-// Storage local
-const storage = multer.diskStorage({
+// =====================================================
+// STOCKAGE LOCAL
+// =====================================================
+
+const localStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
+
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
-  }
+  },
 });
 
-const upload = multer({ storage });
 
-// Route upload devoirs
+// =====================================================
+// STOCKAGE CLOUDINARY
+// =====================================================
 
-router.post("/", upload.array("fichiers", 5), ajouterDevoirs);
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+
+  params: async (req, file) => {
+    return {
+      folder: "senecolevirtuelle/cours",
+
+      resource_type: "auto",
+
+      public_id:
+        Date.now() +
+        "-" +
+        file.originalname
+          .replace(/\.[^/.]+$/, "")
+          .replace(/[^a-zA-Z0-9-_]/g, "_"),
+    };
+  },
+});
 
 
-// Routes
+// =====================================================
+// CHOIX DU STOCKAGE
+// =====================================================
 
-// Ajouter un devoir avec fichiers
-// Ajouter un devoir (sécurisé)
-router.post("/", verifyToken, upload.array("fichiers", 10), ajouterDevoirs);
+const storage =
+  process.env.NODE_ENV === "production"
+    ? cloudinaryStorage
+    : localStorage;
 
-// Récupérer tous les devoirs d'un professeur
-router.get("/prof", verifyToken ,getDevoirsParProfesseur);
 
-// Récupérer tous les devoirs d'une classe
-router.get("/classe/:classeId", verifyToken, getDevoirsParClasse);
+const upload = multer({
+  storage,
+});
+
+
+// =====================================================
+// AJOUTER UN DEVOIR
+// =====================================================
+
+router.post(
+  "/",
+  verifyToken,
+  upload.array("fichiers", 10),
+  ajouterDevoirs
+);
+
+
+// =====================================================
+// RÉCUPÉRER LES DEVOIRS D'UN PROFESSEUR
+// =====================================================
+
+router.get(
+  "/prof",
+  verifyToken,
+  getDevoirsParProfesseur
+);
+
+
+// =====================================================
+// RÉCUPÉRER LES DEVOIRS D'UNE CLASSE
+// =====================================================
+
+router.get(
+  "/classe/:classeId",
+  verifyToken,
+  getDevoirsParClasse
+);
+
+
+// =====================================================
+// TEST
+// =====================================================
 
 router.get("/test", (req, res) => {
   res.send("Route devoirs OK");
 });
 
-// Supprimer un devoirs (sécurisé)
-router.delete("/:id", protect, supprimerDevoirs);
+
+// =====================================================
+// SUPPRIMER UN DEVOIR
+// =====================================================
+
+router.delete(
+  "/:id",
+  protect,
+  supprimerDevoirs
+);
+
 
 export default router;
+
