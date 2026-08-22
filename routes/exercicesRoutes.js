@@ -4,6 +4,7 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { ajouterExercices, getExercicesParProfesseur, getExercicesParClasse, supprimerExercices } from "../controller/exercicesController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import cloudinary from "../config/cloudinary.js";
 
 
 
