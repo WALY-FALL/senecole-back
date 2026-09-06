@@ -1,6 +1,6 @@
 //Fonction pour créer une classe dans la base de donnee mongooose
 import Classe from "../models/classmodel.js";
-import DemandeAcces from "../models/demandeAccesmodel.js";
+import DemandeAcces from "../models/DemandeAccesmodel.js";
 
 
 // Créer une classe liée au prof connecté
