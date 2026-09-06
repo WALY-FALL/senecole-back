@@ -1,5 +1,6 @@
 //Fonction pour créer une classe dans la base de donnee mongooose
 import Classe from "../models/classmodel.js";
+import DemandeAcces from "../models/demandeAccesmodel.js";
 
 
 // Créer une classe liée au prof connecté
@@ -96,5 +97,40 @@ export const deleteClass = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+export const getElevesByClasse = async (req, res) => {
+  try {
+    const { classeId } = req.params;
+
+    const demandes = await DemandeAcces.find({
+      classeId,
+      statut: "accepte",
+    }).populate(
+      "eleveId",
+      "prenom nom email"
+    );
+
+    const eleves = demandes
+      .filter((demande) => demande.eleveId)
+      .map((demande) => demande.eleveId);
+
+    res.status(200).json({
+      success: true,
+      eleves,
+    });
+
+  } catch (error) {
+    console.error(
+      "Erreur récupération élèves classe :",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des élèves.",
+      error: error.message,
+    });
   }
 };

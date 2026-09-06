@@ -1,6 +1,6 @@
 
 import express from "express";
-import {createClass, getClasseById, getMyClasses, updateClass, deleteClass} from "../controller/classcontroller.js";
+import {createClass, getClasseById, getMyClasses, updateClass, deleteClass, getElevesByClasse} from "../controller/classcontroller.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import Classe from "../models/classmodel.js";
 
@@ -42,6 +42,8 @@ router.post("/create", protect, createClass);
 // Route pour récupérer MES classes (protégée aussi)
 router.get("/my-classes", protect, getMyClasses);
 
+router.get("/:id/eleves", protect, getElevesByClasse);
+
 router.get("/:id", protect, getClasseById);          // Voir une classe par son ID
 
 // Modifier une classe (protégé)
@@ -49,5 +51,7 @@ router.put("/update/:id", protect, updateClass);
 
 // Supprimer une classe (protégé)
 router.delete("/delete/:id", protect, deleteClass);
+
+
 
 export default router;
